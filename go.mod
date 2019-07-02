@@ -1,4 +1,4 @@
-module github.com/Trendyol/goprometheus
+module github.com/gunerhuseyin/goprometheus
 
 go 1.12
 
