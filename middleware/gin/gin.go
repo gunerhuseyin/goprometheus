@@ -12,7 +12,7 @@ import (
 
 type GinPrometheus struct {
 	goprometheus *goprometheus.GoPrometheus
-	config       Config
+	config       *Config
 	values       []string
 }
 
@@ -31,7 +31,7 @@ type Config struct {
 
 func Default(gop *goprometheus.GoPrometheus) *GinPrometheus {
 
-	c := Config{
+	c := &Config{
 		hostname:            hostname(),
 		Engine:              gin.Default(),
 		MetricName:          "gin_requests_duration",
@@ -57,7 +57,7 @@ func Default(gop *goprometheus.GoPrometheus) *GinPrometheus {
 	return &gp
 }
 
-func New(gop *goprometheus.GoPrometheus, c Config) *GinPrometheus {
+func New(gop *goprometheus.GoPrometheus, c *Config) *GinPrometheus {
 
 	c.hostname = hostname()
 	c.labels = []string{"node", "code", "method", "handler", "host", "url", "time"}

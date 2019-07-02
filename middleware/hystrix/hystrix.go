@@ -77,20 +77,20 @@ func Default(gp *gp.GoPrometheus) *HystrixPrometheus {
 		Prefix: "hystrix_circuit_breaker_",
 	}
 
-	gp.AddCounterVector(config.Prefix+Attempts, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+Errors, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+Successes, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+Failures, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+Rejects, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+ShortCircuits, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+Timeouts, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+FallbackSuccesses, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+FallbackFailures, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+ContextCanceled, "circuit open", []string{"name"})
-	gp.AddCounterVector(config.Prefix+ContextDeadlineExceeded, "circuit open", []string{"name"})
-	gp.AddGaugeVector(config.Prefix+TotalDuration, "circuit open", []string{"name"})
-	gp.AddGaugeVector(config.Prefix+RunDuration, "circuit open", []string{"name"})
-	gp.AddGaugeVector(config.Prefix+ConcurrencyInUse, "circuit open", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Attempts, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Errors, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Successes, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Failures, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Rejects, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+ShortCircuits, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+Timeouts, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+FallbackSuccesses, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+FallbackFailures, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+ContextCanceled, "", []string{"name"})
+	gp.AddCounterVector(config.Prefix+ContextDeadlineExceeded, "", []string{"name"})
+	gp.AddGaugeVector(config.Prefix+TotalDuration, "", []string{"name"})
+	gp.AddGaugeVector(config.Prefix+RunDuration, "", []string{"name"})
+	gp.AddGaugeVector(config.Prefix+ConcurrencyInUse, "", []string{"name"})
 
 	return &HystrixPrometheus{
 		goprometheus: gp,
