@@ -13,11 +13,11 @@ import (
 type GinPrometheus struct {
 	goprometheus *goprometheus.GoPrometheus
 	config       Config
+	values       []string
 }
 
 type Config struct {
 	labels              []string
-	labelValues         []string
 	hostname            string
 	Engine              *gin.Engine
 	MetricName          string
@@ -91,23 +91,23 @@ func (gp *GinPrometheus) Middleware(c *gin.Context) {
 		}
 	}
 
-	gp.config.labelValues = []string{gp.config.hostname, status, c.Request.Method, c.HandlerName(), c.Request.Host, url, time.Now().UTC().Format(gp.config.TimeFormat)}
+	gp.values = []string{hostname(), status, c.Request.Method, c.HandlerName(), c.Request.Host, url, time.Now().UTC().Format(gp.config.TimeFormat)}
 
 	if gp.config.EnableRequestBody {
 		out, err := json.Marshal(c.Request.Body)
 		if err != nil {
-			gp.config.labelValues = append(gp.config.labelValues, "")
+			gp.values = append(gp.values, "")
 		} else {
-			gp.config.labelValues = append(gp.config.labelValues, string(out))
+			gp.values = append(gp.values, string(out))
 		}
 	}
 
 	if gp.config.EnableRequestHeader {
 		out, err := json.Marshal(c.Request.Header)
 		if err != nil {
-			gp.config.labelValues = append(gp.config.labelValues, "")
+			gp.values = append(gp.values, "")
 		} else {
-			gp.config.labelValues = append(gp.config.labelValues, string(out))
+			gp.values = append(gp.values, string(out))
 		}
 	}
 
@@ -135,7 +135,7 @@ func (gp *GinPrometheus) timeTrack(start time.Time) {
 		elapsed = float64(time.Since(start).Nanoseconds()) / 1000000
 	}
 
-	gp.goprometheus.Vectors.SummaryVectors[gp.config.MetricName].AddMetric(elapsed,gp.config.labels...)
+	gp.goprometheus.Vectors.SummaryVectors[gp.config.MetricName].AddMetric(elapsed, gp.values...)
 
 }
 
