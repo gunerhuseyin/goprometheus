@@ -82,6 +82,18 @@ func New(gop *goprometheus.GoPrometheus, c *Config) *GinPrometheus {
 
 func (gp *GinPrometheus) Middleware(c *gin.Context) {
 
+	defer gp.trace(c, time.Now())
+
+	c.Next()
+}
+
+func (gp *GinPrometheus) GetEngine() *gin.Engine {
+	return gp.config.Engine
+}
+
+
+func (gp *GinPrometheus) trace(c *gin.Context, start time.Time) {
+
 	status := strconv.Itoa(c.Writer.Status())
 	url := c.Request.URL.String()
 
@@ -111,16 +123,12 @@ func (gp *GinPrometheus) Middleware(c *gin.Context) {
 		}
 	}
 
-	defer gp.timeTrack(time.Now())
+	elapsed := gp.since(start)
 
-	c.Next()
+	gp.goprometheus.Vectors.SummaryVectors[gp.config.MetricName].AddMetric(elapsed, gp.values...)
 }
 
-func (gp *GinPrometheus) GetEngine() *gin.Engine {
-	return gp.config.Engine
-}
-
-func (gp *GinPrometheus) timeTrack(start time.Time) {
+func (gp *GinPrometheus) since(start time.Time) float64 {
 
 	var elapsed float64
 
@@ -135,7 +143,7 @@ func (gp *GinPrometheus) timeTrack(start time.Time) {
 		elapsed = float64(time.Since(start).Nanoseconds()) / 1000000
 	}
 
-	gp.goprometheus.Vectors.SummaryVectors[gp.config.MetricName].AddMetric(elapsed, gp.values...)
+	return elapsed
 
 }
 
