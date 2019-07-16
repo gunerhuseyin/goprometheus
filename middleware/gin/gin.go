@@ -25,6 +25,7 @@ type Config struct {
 	IgnorePaths         map[string]bool
 	TimeFormat          string
 	DurationType        string
+	EnableTime          bool
 	EnableRequestHeader bool
 	EnableRequestBody   bool
 }
@@ -36,8 +37,8 @@ func Default(gop *goprometheus.GoPrometheus) *GinPrometheus {
 		Engine:              gin.Default(),
 		MetricName:          "gin_requests_duration",
 		MetricDescription:   "The duration of requests",
-		TimeFormat:          "2006-01-02T15:04:05.9",
 		DurationType:        "ms",
+		EnableTime:          false,
 		EnableRequestHeader: false,
 		EnableRequestBody:   false,
 		labels:              []string{"node", "code", "method", "handler", "host", "url", "time"},
@@ -60,7 +61,7 @@ func Default(gop *goprometheus.GoPrometheus) *GinPrometheus {
 func New(gop *goprometheus.GoPrometheus, c *Config) *GinPrometheus {
 
 	c.hostname = hostname()
-	c.labels = []string{"node", "code", "method", "handler", "host", "url", "time"}
+	c.labels = []string{"node", "code", "method", "handler", "host", "url"}
 
 	if c.EnableRequestBody {
 		c.labels = append(c.labels, "body")
@@ -68,6 +69,10 @@ func New(gop *goprometheus.GoPrometheus, c *Config) *GinPrometheus {
 
 	if c.EnableRequestHeader {
 		c.labels = append(c.labels, "header")
+	}
+
+	if c.EnableTime {
+		c.labels = append(c.labels, "time")
 	}
 
 	gp := GinPrometheus{
@@ -91,7 +96,6 @@ func (gp *GinPrometheus) GetEngine() *gin.Engine {
 	return gp.config.Engine
 }
 
-
 func (gp *GinPrometheus) trace(c *gin.Context, start time.Time) {
 
 	status := strconv.Itoa(c.Writer.Status())
@@ -103,7 +107,7 @@ func (gp *GinPrometheus) trace(c *gin.Context, start time.Time) {
 		}
 	}
 
-	gp.values = []string{hostname(), status, c.Request.Method, c.HandlerName(), c.Request.Host, url, time.Now().UTC().Format(gp.config.TimeFormat)}
+	gp.values = []string{hostname(), status, c.Request.Method, c.HandlerName(), c.Request.Host, url}
 
 	if gp.config.EnableRequestBody {
 		out, err := json.Marshal(c.Request.Body)
@@ -121,6 +125,10 @@ func (gp *GinPrometheus) trace(c *gin.Context, start time.Time) {
 		} else {
 			gp.values = append(gp.values, string(out))
 		}
+	}
+
+	if gp.config.EnableTime {
+		gp.values = append(gp.values, time.Now().UTC().Format(gp.config.TimeFormat))
 	}
 
 	elapsed := gp.since(start)
